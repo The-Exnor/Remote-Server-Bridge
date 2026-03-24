@@ -18,3 +18,7 @@ How to use:
 
             In the Libraries section, a new librarie called "Remote Server" should be availabe.
             Thats it. You now should be able to browse and play from the remote server you entered.
+
+DISCLAIMER:  
+
+            The code in this plugin was made with the help of a LLM/Deep Learning machine, in particular Google's GeMini Pro 3.1
