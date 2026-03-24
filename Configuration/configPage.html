@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Remote Server Bridge</title>
+</head>
+<body>
+    <div id="RemoteServerBridgeConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="RemoteServerBridgeConfigForm">
+                    <div class="sectionTitle">Remote Server Settings</div>
+                    
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="txtRemoteServerUrl">Remote Server URL</label>
+                        <input id="txtRemoteServerUrl" name="txtRemoteServerUrl" type="url" is="emby-input" placeholder="https://jellyfin.example.com" required />
+                        <div class="fieldDescription">The full URL of the remote Jellyfin server.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="txtUsername">Username</label>
+                        <input id="txtUsername" name="txtUsername" type="text" is="emby-input" required />
+                        <div class="fieldDescription">The account username on the remote server.</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel" for="txtPassword">Password</label>
+                        <input id="txtPassword" name="txtPassword" type="password" is="emby-input" required />
+                        <div class="fieldDescription">The account password on the remote server.</div>
+                    </div>
+
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-confirm block">
+                            <span>Save Settings</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            (function () {
+                // This ID must match the Guid the Plugin.cs
+                const pluginId = "096df3f4-4363-44f6-8208-410a0e5b854e"; 
+
+                document.querySelector('#RemoteServerBridgeConfigPage').addEventListener('pageshow', function () {
+                    Dashboard.showLoadingMsg();
+
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        document.querySelector('#txtRemoteServerUrl').value = config.RemoteServerUrl || '';
+                        document.querySelector('#txtUsername').value = config.Username || '';
+                        document.querySelector('#txtPassword').value = config.Password || '';
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+                document.querySelector('#RemoteServerBridgeConfigForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    Dashboard.showLoadingMsg();
+
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        // 
+                        config.RemoteServerUrl = document.querySelector('#txtRemoteServerUrl').value.trim();
+                        config.Username = document.querySelector('#txtUsername').value.trim();
+                        config.Password = document.querySelector('#txtPassword').value;
+
+                        ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
+                            Dashboard.processPluginConfigurationUpdateResult(result);
+                        });
+                    });
+
+                    return false;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>
