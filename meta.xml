@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PluginInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>RemoteServerBridge</Name>
+  <Version>1.0.0.0</Version>
+  <Id>A1B2C3D4-E5F6-4a1b-9c8d-7e6f5a4b3c2d</Id>
+  <Description>Syncs media from a remote Jellyfin server.</Description>
+</PluginInfo>
