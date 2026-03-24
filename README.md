@@ -3,6 +3,7 @@
 Plugin for Jellyfin server that allows connection from a local server to a remote Jellyfin server via Username and Password (no API required)
 
 How to use:
+            
             Create a folder named RemoteServerBridge on your plugins folder.
             (Example: /var/lib/jellyfin/plugins/RemoteServerBridge)
 
