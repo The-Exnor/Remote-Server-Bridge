@@ -80,7 +80,7 @@ public class RemoteServerTask : IScheduledTask
 
             // 3. Send Request
             using var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-            // Important: Explicitly set content type to avoid 'charset=utf-8'
+            // maybe?
             content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
             var response = await client.PostAsync($"{cleanUrl}/Users/AuthenticateByName", content, cancellationToken);
@@ -106,23 +106,36 @@ public class RemoteServerTask : IScheduledTask
             var itemsRoot = await client.GetFromJsonAsync<JsonElement>(itemsUrl, cancellationToken);
             if (itemsRoot.TryGetProperty("Items", out var items))
             {
-                int count = 0;
+			  int count = 0;
                 foreach (var item in items.EnumerateArray())
                 {
                     string name = item.GetProperty("Name").GetString()!;
                     string id = item.GetProperty("Id").GetString()!;
                     
                     string safeName = string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
-                    string streamUrl = $"{cleanUrl}/Videos/{id}/stream.mp4?static=true";
+                    
+                    // Append the Access Token directly into the URL
+                    string streamUrl = $"{cleanUrl}/Videos/{id}/stream.mp4?static=true&api_key={token}";
                     string filePath = Path.Combine(_stubsPath, $"{safeName}.strm");
 
-                    if (!File.Exists(filePath))
+                  // This ensures old files get updated with fresh login tokens.
+                    bool shouldWrite = true;
+                    if (File.Exists(filePath))
+                    {
+                        string existingUrl = await File.ReadAllTextAsync(filePath, cancellationToken);
+                        if (existingUrl == streamUrl)
+                        {
+                            shouldWrite = false; // Token and URL match, skip writing
+                        }
+                    }
+
+                    if (shouldWrite)
                     {
                         await File.WriteAllTextAsync(filePath, streamUrl, cancellationToken);
                         count++;
                     }
                 }
-                _logger.LogInformation("Remote Bridge: Sync finished. Added {Count} movies.", count);
+                _logger.LogInformation("Remote Bridge: Sync finished. Updated/Added {Count} movies.", count);
             }
 
             EnsureVirtualFolder();
